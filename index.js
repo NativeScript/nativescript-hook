@@ -37,7 +37,10 @@ exports.postinstall = function postinstall(pkgdir) {
 		}
 		var hookFileName = generateHookName(pkg, hook);
 		var hookPath = path.join(hookDir, hookFileName);
-		fs.writeFileSync(hookPath, util.format('require("%s/%s");' + os.EOL, pkg.name, hook.script));
+
+		var trampoline = util.format('%srequire("%s/%s");', hook.inject ? 'module.exports = ' : '', pkg.name, hook.script);
+
+		fs.writeFileSync(hookPath, trampoline + os.EOL);
 		hookFiles.push(path.relative(pkgdir, hookPath));
 	});
 
