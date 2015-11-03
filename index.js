@@ -1,3 +1,17 @@
+module.exports = function (__dirname) {
+	return {
+		findProjectDir: function () {
+			return findProjectDir(__dirname);
+		},
+		postinstall: function () {
+			return postinstall(__dirname);
+		},
+		preuninstall: function () {
+			return preuninstall(__dirname);
+		}
+	};
+}
+
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
@@ -8,6 +22,26 @@ function generateHookName(pkg, hook) {
 	return pkg.name + '.js';
 }
 
+function findProjectDir(pkgdir) {
+	var candidateDir = pkgdir;
+
+	while (true) {
+		var oldCandidateDir = candidateDir;
+		candidateDir = path.dirname(candidateDir);
+		if (path.basename(candidateDir) === 'node_modules') {
+			continue;
+		}
+		var packageJsonFile = path.join(candidateDir, 'package.json');
+		if (fs.existsSync(packageJsonFile)) {
+			return candidateDir;
+		}
+
+		if (oldCandidateDir === candidateDir) {
+			return;
+		}
+	}
+}
+
 function forEachHook(pkgdir, callback) {
 	var pkg = require(path.join(pkgdir, 'package.json'));
 	var ns = pkg.nativescript;
@@ -15,11 +49,11 @@ function forEachHook(pkgdir, callback) {
 		throw Error('Not a NativeScript development module.');
 	}
 
-	var hooksDir = process.env['TNS_HOOKS_DIR'];
-	if (!hooksDir) {
-		console.warn('This module should be installed through the `tns install` command, not npm.');
-		process.exit(1);
+	var projectDir = findProjectDir(pkgdir);
+	if (!projectDir) {
+		return;
 	}
+	var hooksDir = path.join(projectDir, 'hooks');
 
 	if (ns.hooks) {
 		ns.hooks.forEach(function (hook) {
@@ -28,8 +62,7 @@ function forEachHook(pkgdir, callback) {
 	}
 }
 
-exports.postinstall = function postinstall(pkgdir) {
-	var hookFiles = [];
+function postinstall(pkgdir) {
 	forEachHook(pkgdir, function (hooksDir, pkg, hook) {
 		var hookDir = path.join(hooksDir, hook.type);
 		if (!fs.existsSync(hookDir)) {
@@ -41,22 +74,21 @@ exports.postinstall = function postinstall(pkgdir) {
 		var trampoline = util.format('%srequire("%s/%s");', hook.inject ? 'module.exports = ' : '', pkg.name, hook.script);
 
 		fs.writeFileSync(hookPath, trampoline + os.EOL);
-		hookFiles.push(path.relative(pkgdir, hookPath));
 	});
-
-	fs.writeFileSync(path.join(pkgdir, '_hooks.json'), JSON.stringify(hookFiles));
 }
 
-exports.preuninstall = function preuninstall(pkgdir) {
-	try {
-		var hookFiles = JSON.parse(fs.readFileSync(path.join(pkgdir, '_hooks.json')));
-		hookFiles.forEach(function (hookRelativePath) {
-			var hookFileName = path.join(pkgdir, hookRelativePath);
-			if (fs.existsSync(hookFileName)) {
-				fs.unlinkSync(hookFileName);
+function preuninstall(pkgdir) {
+	forEachHook(pkgdir, function (hooksDir, pkg, hook) {
+		var hookDir = path.join(hooksDir, hook.type);
+		var hookFileName = generateHookName(pkg, hook);
+		var hookPath = path.join(hookDir, hookFileName);
+
+		try {
+			if (fs.existsSync(hookPath)) {
+				fs.unlinkSync(hookPath);
 			}
-		});
-	} catch (err) {
-		console.warn('pkgdir: ' + err.toString());
-	}
+		} catch (err) {
+			console.warn('nativescript-hook: ' + err.toString());
+		}
+	});
 }
