@@ -1,6 +1,6 @@
 {
   "name": "nativescript-hook",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Helper module for installing hooks into NativeScript projects",
   "main": "index.js",
   "scripts": {
