@@ -10,13 +10,14 @@ module.exports = function (__dirname) {
 			return preuninstall(__dirname);
 		}
 	};
-}
+};
 
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
 var util = require('util');
 var mkdirp = require('mkdirp');
+var glob = require('glob');
 
 function generateHookName(pkg, hook) {
 	return pkg.name + '.js';
@@ -57,9 +58,16 @@ function forEachHook(pkgdir, callback) {
 
 	if (ns.hooks) {
 		ns.hooks.forEach(function (hook) {
-			callback(hooksDir, pkg, hook)
+			callback(hooksDir, pkg, hook);
 		});
 	}
+}
+
+function hookInstalled(hookDir, pkg, hook) {
+	var hookBaseName = pkg.name;
+	var hookGlob = path.join(hookDir, "*" + hookBaseName + "*");
+	var files = glob.sync(hookGlob);
+	return files.length > 0;
 }
 
 function postinstall(pkgdir) {
@@ -67,6 +75,10 @@ function postinstall(pkgdir) {
 		var hookDir = path.join(hooksDir, hook.type);
 		if (!fs.existsSync(hookDir)) {
 			mkdirp.sync(hookDir);
+		}
+		if (hookInstalled(hookDir, pkg, hook)) {
+			console.log('Hook already installed: ' + pkg.name);
+			return;
 		}
 		var hookFileName = generateHookName(pkg, hook);
 		var hookPath = path.join(hookDir, hookFileName);
