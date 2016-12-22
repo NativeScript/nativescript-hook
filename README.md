@@ -38,12 +38,12 @@ Add a post-install and pre-uninstall script to your `package.json`, if you haven
 
 The post-install script (`postinstall.js` in the example) should contain the following line:
 ```
-require('nativescript-hook').postinstall(__dirname);
+require('nativescript-hook')(__dirname).postinstall();
 ```
 
 The pre-uninstall script (`preuninstall.js` in the example) should contain the following line:
 ```
-require('nativescript-hook').preuninstall(__dirname);
+require('nativescript-hook')(__dirname).preuninstall();
 ```
 
 These two hooks will take care of installing and removing the hooks from the NativeScript project, when your module is installed or uninstalled.
