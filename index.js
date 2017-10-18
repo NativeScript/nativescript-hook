@@ -24,6 +24,10 @@ function generateHookName(pkg, hook) {
 }
 
 function findProjectDir(pkgdir) {
+	if (process.env.INIT_CWD) {
+		return process.env.INIT_CWD;
+	}
+
 	var candidateDir = pkgdir;
 
 	while (true) {
