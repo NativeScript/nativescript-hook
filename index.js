@@ -1,5 +1,24 @@
 module.exports = function (__dirname) {
 	return {
+		/**
+		 * The `npm i` in `nativescript-dev-*` modules installs locally hooks.
+		 * This property can be used to check if the plugin is actually installed in a project.
+		 *  - **true** - The plugin is installed in an app.
+		 *  - **false** - The plugin is installing locally its own devDependencies.
+		 * 
+		 * ```
+		 * const hooks = require("nativescript-hook");
+		 * const { isInstalledInProject, postinstall } = hooks(__dirname);
+		 * 
+		 * if (isInstalledInProject) {
+		 *     postinstall();
+		 *     // Copy files, configure, etc.
+		 * }
+		 * ```
+		 */
+		get isInstalledInProject() {
+			return findProjectDir(__dirname) != __dirname;
+		},
 		findProjectDir: function () {
 			return findProjectDir(__dirname);
 		},
