@@ -24,27 +24,40 @@ function generateHookName(pkg, hook) {
 }
 
 function findProjectDir(pkgdir) {
-	if (process.env.INIT_CWD) {
+	if (process.env.INIT_CWD && _isNativeScriptAppRoot(process.env.INIT_CWD)) {
 		return process.env.INIT_CWD;
 	}
 
 	var candidateDir = pkgdir;
+	var oldCandidateDir = null;
 
 	while (true) {
-		var oldCandidateDir = candidateDir;
 		candidateDir = path.dirname(candidateDir);
-		if (path.basename(candidateDir) === 'node_modules') {
-			continue;
-		}
-		var packageJsonFile = path.join(candidateDir, 'package.json');
-		if (fs.existsSync(packageJsonFile)) {
-			return candidateDir;
-		}
-
 		if (oldCandidateDir === candidateDir) {
 			return;
 		}
+
+		if (path.basename(candidateDir) === 'node_modules') {
+			continue;
+		}
+		
+		if (_isNativeScriptAppRoot(candidateDir)) {
+			return candidateDir;
+		}
+
+		oldCandidateDir = candidateDir;
 	}
+}
+
+function _isNativeScriptAppRoot(dir) {
+	var isNativeScriptAppRoot = false;
+	var packageJsonFile = path.join(dir, 'package.json');
+	if (fs.existsSync(packageJsonFile)) {
+		var packageJsonContent = require(packageJsonFile);
+		isNativeScriptAppRoot = !!packageJsonContent.nativescript && !!packageJsonContent.nativescript.id;
+	}
+
+	return isNativeScriptAppRoot;
 }
 
 function forEachHook(pkgdir, callback) {
