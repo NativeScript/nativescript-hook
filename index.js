@@ -19,8 +19,12 @@ var util = require('util');
 var mkdirp = require('mkdirp');
 var glob = require('glob');
 
+function transformScopedName(name) {
+	return name.replace(/^@(.*)\/(.*)/, "$1-$2");
+}
+
 function generateHookName(pkg, hook) {
-	return pkg.name + '.js';
+	return transformScopedName(pkg.name) + '.js';
 }
 
 function findProjectDir(pkgdir) {
