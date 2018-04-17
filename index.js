@@ -40,7 +40,7 @@ function findProjectDir(pkgdir) {
 		if (path.basename(candidateDir) === 'node_modules') {
 			continue;
 		}
-		
+
 		if (_isNativeScriptAppRoot(candidateDir)) {
 			return candidateDir;
 		}
@@ -94,7 +94,7 @@ function postinstall(pkgdir) {
 			mkdirp.sync(hookDir);
 		}
 		if (hookInstalled(hookDir, pkg, hook)) {
-			console.log('Hook already installed: ' + pkg.name);
+			console.log(`Hook already installed: ${pkg.name} at location: ${hookDir}`);
 			return;
 		}
 		var hookFileName = generateHookName(pkg, hook);
