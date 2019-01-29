@@ -104,3 +104,20 @@ And finally, when installing in-process hooks through this module, you need to e
   },
 }
 ```
+
+You have the ability to define a custom name to your hook in `package.json`, this attribute is optional and defaults to the plugin package name:
+```json
+{
+  "nativescript": {
+    "hooks": [
+      {
+        "type": "after-prepare",
+        "script": "lib/after-prepare.js",
+        "name": "my-custom-hook"
+      }
+    ]
+  },
+}
+```
+
+
