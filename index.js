@@ -20,7 +20,7 @@ var mkdirp = require('mkdirp');
 var glob = require('glob');
 
 function generateHookName(pkg, hook) {
-	return pkg.name + '.js';
+	return (hook.name || pkg.name) + '.js';
 }
 
 function findProjectDir(pkgdir) {
