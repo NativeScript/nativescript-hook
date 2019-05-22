@@ -1,6 +1,7 @@
 nativescript-hook
 =======================================
 
+t1
 This module gives you an easier way to install hooks into NativeScript projects when using the `tns install <module>` command. A project hook is some sort of script that is configured to be executed when the NativeScript CLI executes some action.
 
 Hooks go into the `hooks/` folder of a project. For example, when `tns prepare ...` is executed, all script files in the `hooks/before-prepare/` and `hooks/after-prepare/` folders are executed, as well.
