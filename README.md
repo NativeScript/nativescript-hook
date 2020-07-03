@@ -1,4 +1,4 @@
-nativescript-hook
+@nativescript/hook
 =======================================
 
 This module gives you an easier way to install hooks into NativeScript projects when using the `tns install <module>` command. A project hook is some sort of script that is configured to be executed when the NativeScript CLI executes some action.
@@ -38,12 +38,12 @@ Add a post-install and pre-uninstall script to your `package.json`, if you haven
 
 The post-install script (`postinstall.js` in the example) should contain the following line:
 ```
-require('nativescript-hook')(__dirname).postinstall();
+require('@nativescript/hook')(__dirname).postinstall();
 ```
 
 The pre-uninstall script (`preuninstall.js` in the example) should contain the following line:
 ```
-require('nativescript-hook')(__dirname).preuninstall();
+require('@nativescript/hook')(__dirname).preuninstall();
 ```
 
 These two hooks will take care of installing and removing the hooks from the NativeScript project, when your module is installed or uninstalled.
