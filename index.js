@@ -69,15 +69,15 @@ function forEachHook(pkgdir, callback) {
   }
 
   var projectDir = findProjectDir(pkgdir);
-	if (!projectDir) {
+  if (!projectDir) {
     // in case of plugins like file:../../plugin it would fail because
     // pkgdir is the plugin actual dir which is not "inside" the app project folder.
-		if (_isNativeScriptAppRoot(process.cwd())) {
-			projectDir = process.cwd();
-		} else {
-			return;
-		}
-	}
+    if (_isNativeScriptAppRoot(process.cwd())) {
+      projectDir = process.cwd();
+    } else {
+      return;
+    }
+  }
   var hooksDir = path.join(projectDir, 'hooks');
 
   if (ns.hooks) {
