@@ -51,14 +51,13 @@ function findProjectDir(pkgdir) {
 }
 
 function _isNativeScriptAppRoot(dir) {
-  var isNativeScriptAppRoot = false;
-  var packageJsonFile = path.join(dir, 'package.json');
-  if (fs.existsSync(packageJsonFile)) {
-    var packageJsonContent = require(packageJsonFile);
-    isNativeScriptAppRoot = !!packageJsonContent.nativescript && !!packageJsonContent.nativescript.id;
+  var tsConfig = path.join(dir, 'nativescript.config.ts');
+  var jsConfig = path.join(dir, 'nativescript.config.js');
+  if (fs.existsSync(tsConfig) || fs.existsSync(jsConfig)) {
+    return true;
   }
 
-  return isNativeScriptAppRoot;
+  return false;
 }
 
 function forEachHook(pkgdir, callback) {
