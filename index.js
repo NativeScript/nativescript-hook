@@ -29,11 +29,10 @@ function findProjectDir(pkgdir) {
     return process.env.INIT_CWD;
   }
 
-  var candidateDir = pkgdir;
+  var candidateDir = process.cwd();
   var oldCandidateDir = null;
 
   while (true) {
-    candidateDir = path.dirname(candidateDir);
     if (oldCandidateDir === candidateDir) {
       return;
     }
@@ -47,6 +46,7 @@ function findProjectDir(pkgdir) {
     }
 
     oldCandidateDir = candidateDir;
+    candidateDir = path.dirname(candidateDir);
   }
 }
 
