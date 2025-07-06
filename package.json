@@ -13,7 +13,7 @@
     "url": "https://github.com/NativeScript/nativescript-hook.git"
   },
   "dependencies": {
-    "glob": "^7.1.0",
-    "mkdirp": "^1.0.4"
+    "glob": "^11.0.0",
+    "mkdirp": "^3.0.1"
   }
 }
