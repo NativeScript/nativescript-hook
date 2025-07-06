@@ -100,7 +100,9 @@ function postinstall(pkgdir) {
     var hookFileName = generateHookName(pkg, hook);
     var hookPath = path.join(hookDir, hookFileName);
 
-    var trampoline = util.format('%srequire("%s/%s");', hook.inject ? 'module.exports = ' : '', pkg.name, hook.script);
+    var trampoline = `import hooks from "${pkg.name}/${hook.script}";
+
+export default hooks;`
 
     fs.writeFileSync(hookPath, trampoline + os.EOL);
   });
