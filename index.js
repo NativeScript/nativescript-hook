@@ -21,7 +21,7 @@ var glob = require('glob');
 
 function generateHookName(pkg, hook) {
   // flatten scoped packages to names
-  return ((hook.name || pkg.name).replace(/@/ig, '').replace(/\//ig, '-')) + '.js';
+  return ((hook.name || pkg.name).replace(/@/ig, '').replace(/\//ig, '-')) + '.mjs';
 }
 
 function findProjectDir(pkgdir) {
