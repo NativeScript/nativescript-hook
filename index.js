@@ -19,9 +19,13 @@ var util = require('util');
 var mkdirp = require('mkdirp');
 var glob = require('glob');
 
-function generateHookName(pkg, hook) {
+function getExtension(hook) {
+  return path.extname(hook.script) || '.mjs';
+}
+
+function generateHookName(pkg, hook, hookExtension) {
   // flatten scoped packages to names
-  return ((hook.name || pkg.name).replace(/@/ig, '').replace(/\//ig, '-')) + '.mjs';
+  return ((hook.name || pkg.name).replace(/@/ig, '').replace(/\//ig, '-')) + hookExtension;
 }
 
 function findProjectDir(pkgdir) {
@@ -97,12 +101,17 @@ function postinstall(pkgdir) {
       console.log(`Hook already installed: ${pkg.name} at location: ${hookDir}`);
       return;
     }
-    var hookFileName = generateHookName(pkg, hook);
+    var hookExtension = getExtension(hook);
+    var hookFileName = generateHookName(pkg, hook, hookExtension);
     var hookPath = path.join(hookDir, hookFileName);
 
+    var trampoline = '';
+    if (hookExtension === '.mjs') {
     var trampoline = `import hooks from "${pkg.name}/${hook.script}";
-
 export default hooks;`
+    } else if (['.js', '.cjs'].includes(hookExtension)) {
+      trampoline = util.format('%srequire("%s/%s");', hook.inject ? 'module.exports = ' : '', pkg.name, hook.script);
+    }
 
     fs.writeFileSync(hookPath, trampoline + os.EOL);
   });
@@ -111,7 +120,8 @@ export default hooks;`
 function preuninstall(pkgdir) {
   forEachHook(pkgdir, function (hooksDir, pkg, hook) {
     var hookDir = path.join(hooksDir, hook.type);
-    var hookFileName = generateHookName(pkg, hook);
+    var hookExtension = getExtension(hook);
+    var hookFileName = generateHookName(pkg, hook, hookExtension);
     var hookPath = path.join(hookDir, hookFileName);
 
     try {
