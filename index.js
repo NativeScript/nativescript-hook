@@ -16,8 +16,6 @@ var fs = require('fs');
 var os = require('os');
 var path = require('path');
 var util = require('util');
-var mkdirp = require('mkdirp');
-var glob = require('glob');
 
 function getExtension(hook) {
   return path.extname(hook.script) || '.mjs';
@@ -86,16 +84,21 @@ function forEachHook(pkgdir, callback) {
 
 function hookInstalled(hookDir, pkg, hook) {
   var hookBaseName = pkg.name;
-  var hookGlob = path.join(hookDir, "*" + hookBaseName + "*");
-  var files = glob.sync(hookGlob);
-  return files.length > 0;
+  try {
+    var entries = fs.readdirSync(hookDir);
+    return entries.some(function (entry) {
+      return entry.includes(hookBaseName);
+    });
+  } catch (e) {
+    return false;
+  }
 }
 
 function postinstall(pkgdir) {
   forEachHook(pkgdir, function (hooksDir, pkg, hook) {
     var hookDir = path.join(hooksDir, hook.type);
     if (!fs.existsSync(hookDir)) {
-      mkdirp.sync(hookDir);
+      fs.mkdirSync(hookDir, { recursive: true });
     }
     if (hookInstalled(hookDir, pkg, hook)) {
       console.log(`Hook already installed: ${pkg.name} at location: ${hookDir}`);
